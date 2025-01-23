@@ -2,19 +2,26 @@ resource "aws_instance" "juice-shop" {
   ami                    = "ami-031e4310b9132e755" #ubuntu with apache pre-installed
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.main_subnet.id
-  associate_public_ip_address = false
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
+  associate_public_ip_address = true
+  vpc_security_group_ids = [aws_security_group.juice-shop-sg.id]
   key_name               = "deployer-key"
 
   user_data = <<-EOF
     #!/bin/bash
-    yum update -y
-    yum install nodejs
+    sudo apt update -y
+    sudo apt install nodejs
+    sudo apt install npm
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+    source ~/.bashrc
+    nvm install 18
+    nvm use 18
+    npm install -g npm
+    npm cache clean --force
     mkdir juice-shop
     cd juice-shop
     wget https://github.com/juice-shop/juice-shop/releases/download/v17.1.1/juice-shop-17.1.1_node18_linux_x64.tgz 
     tar -xvzf juice-shop-17.1.1_node18_linux_x64.tgz
-    cd juice-shop-17.1.1
+    cd juice-shop-17.1.1/
     npm install
     npm start
   EOF

@@ -1,1 +1,2 @@
-.aws/
+.aws/deployer-key.pem
+deployer-key.pem.pub
