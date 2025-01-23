@@ -1,4 +1,4 @@
-resource "aws_instance" "web_vm" {
+resource "aws_instance" "juice-shop" {
   ami                    = "ami-031e4310b9132e755" #ubuntu with apache pre-installed
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.main_subnet.id
@@ -9,13 +9,17 @@ resource "aws_instance" "web_vm" {
   user_data = <<-EOF
     #!/bin/bash
     yum update -y
-    yum install -y httpd
-    systemctl enable httpd
-    systemctl start httpd
-    echo "<h1>Bienvenue sur la VM Web</h1>" > /var/www/html/index.html
+    yum install nodejs
+    mkdir juice-shop
+    cd juice-shop
+    wget https://github.com/juice-shop/juice-shop/releases/download/v17.1.1/juice-shop-17.1.1_node18_linux_x64.tgz 
+    tar -xvzf juice-shop-17.1.1_node18_linux_x64.tgz
+    cd juice-shop-17.1.1
+    npm install
+    npm start
   EOF
 
-  tags = { Name = "Web-VM" }
+  tags = { Name = "juice-shop" }
 }
 
 
@@ -54,17 +58,17 @@ resource "aws_route_table_association" "main_assoc" {
 }
 
 
-esource "aws_security_group" "web_sg" {
-  name        = "web_sg"
-  description = "Allow traffic from Suricata and SSH"
+resource "aws_security_group" "juice-shop-sg" {
+  name        = "juice-shop-sg"
+  description = "Allow all"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description     = "HTTP from Suricata"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.suricata_sg.id]  # Autoriser depuis le SG Suricata
+    description     = "HTTP"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -82,5 +86,5 @@ esource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = { Name = "web_sg" }
+  tags = { Name = "juice-shop-sg" }
 }
