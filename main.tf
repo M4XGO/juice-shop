@@ -9,8 +9,8 @@ resource "aws_instance" "juice-shop" {
   user_data = <<-EOF
     #!/bin/bash
     sudo apt update -y
-    sudo apt install nodejs
-    sudo apt install npm
+    sudo apt install nodejs -y
+    sudo apt install npm -y
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
     source ~/.bashrc
     nvm install 18
@@ -21,8 +21,8 @@ resource "aws_instance" "juice-shop" {
     cd juice-shop
     wget https://github.com/juice-shop/juice-shop/releases/download/v17.1.1/juice-shop-17.1.1_node18_linux_x64.tgz 
     tar -xvzf juice-shop-17.1.1_node18_linux_x64.tgz
-    cd juice-shop-17.1.1/
-    npm install
+    cd juice-shop_17.1.1/
+    # npm install
     npm start
   EOF
 
